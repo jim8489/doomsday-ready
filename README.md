@@ -86,6 +86,29 @@ The seed creates these four cinema records so each supplied algorithm example ca
 
 The seed is intentionally additive: it uses `get_or_create` and does not reset a user's existing watched status or movie fields. The `--if-empty` option is used during automatic Docker startup so an existing collection is left alone. Running the command without that option manually adds missing example records; existing custom prerequisite links are retained and the proposed demo graph is checked for cycles before new links are inserted.
 
+## Optional public demo deployment (Render + Neon)
+
+The repository includes a Render Blueprint in `render.yaml` for a public assessment demo:
+
+- React/Vite is deployed as a Render static site.
+- Django is deployed from `backend/Dockerfile` as a Render Docker web service.
+- PostgreSQL is hosted separately on Neon; the Blueprint prompts for the database connection components and does not store credentials in Git.
+
+### Deployment outline
+
+1. Create a Neon PostgreSQL project and database. In its connection details, use the pooled host if available. Copy the database name, username, password, host, and port; keep these private.
+2. Push the latest repository changes, including `render.yaml`, to GitHub.
+3. In Render, choose **New → Blueprint**, connect `jim8489/doomsday-ready`, select branch `main`, and apply the Blueprint.
+4. When prompted, enter the Neon values for `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_HOST`. Use port `5432`. Do not add secrets to the repository.
+5. Wait for the API and frontend deploys to finish. The intended public URLs are:
+   - Frontend: `https://doomsday-ready-frontend.onrender.com`
+   - API: `https://doomsday-ready-api.onrender.com/api/health/`
+   - Swagger: `https://doomsday-ready-api.onrender.com/api/docs/`
+
+   On an empty Neon database, the backend Docker entrypoint runs migrations and automatically seeds the assessment demo data. Verify that the Movies and Booking endpoints return the seeded records after deployment.
+
+Free Render web services spin down after 15 minutes without inbound traffic, so the first request after inactivity can take around a minute. Neon free compute can also scale to zero. This is suitable for a time-limited assessment demo, not a production availability guarantee. Review the provider's current free-tier limits before deployment.
+
 ## Run the complete application with Docker
 
 Prerequisites: Docker Desktop (or Docker Engine) with the Docker Compose plugin.

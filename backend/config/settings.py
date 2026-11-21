@@ -38,6 +38,16 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# Render provides the deployed service hostname automatically.
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
+
+# Render provides the deployed service hostname automatically.
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,9 +79,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Allow local development origins and the configured public frontend URL.
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173",
+    ).split(",")
+    if origin.strip()
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -108,6 +123,7 @@ DATABASES = {
         "CONN_MAX_AGE": 60,
         "OPTIONS": {
             "connect_timeout": 5,
+            "sslmode": os.getenv("POSTGRES_SSLMODE", "prefer"),
         },
     }
 }
