@@ -18,12 +18,14 @@ import {
   RefreshCw,
   Search,
   Circle,
+  Trash2,
 } from "lucide-react";
 
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 import {
   createMovie,
+  deleteMovie,
   getMovies,
   updateMovie,
 } from "../api/movies";
@@ -106,6 +108,16 @@ export function MoviesPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteMovie,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["movies"] }),
+        queryClient.invalidateQueries({ queryKey: ["rewatch-plan"] }),
+      ]);
+    },
+  });
+
   const movieMap = useMemo(() => {
     return new Map(
       movies.map((movie) => [movie.id, movie]),
@@ -172,6 +184,16 @@ export function MoviesPage() {
       id: movie.id,
       watched: !movie.watched,
     });
+  }
+
+  function handleDelete(movie: Movie) {
+    const confirmed = window.confirm(
+      `Delete \"${movie.title}\"? Its prerequisite links will also be removed.`,
+    );
+
+    if (confirmed) {
+      deleteMutation.mutate(movie.id);
+    }
   }
 
   return (
@@ -256,6 +278,12 @@ export function MoviesPage() {
           >
             Dismiss
           </button>
+        </div>
+      )}
+
+      {deleteMutation.isError && (
+        <div role="alert" className="mb-5 rounded-xl border border-red-400/15 bg-red-400/[0.05] p-4 text-xs text-red-300">
+          Unable to delete movie: {deleteMutation.error.message}
         </div>
       )}
 
@@ -503,6 +531,17 @@ export function MoviesPage() {
                       {movie.watched
                         ? "Mark unwatched"
                         : "Mark watched"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(movie)}
+                      disabled={deleteMutation.isPending}
+                      aria-label={`Delete ${movie.title}`}
+                      title="Delete movie"
+                      className="inline-flex items-center justify-center rounded-lg border border-red-400/15 px-3 py-2.5 text-red-300 transition hover:border-red-400/40 hover:bg-red-400/10 disabled:opacity-50"
+                    >
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </article>

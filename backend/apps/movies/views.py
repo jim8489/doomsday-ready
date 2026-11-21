@@ -16,7 +16,9 @@ from apps.movies.services.rewatch_service import build_rewatch_plan
 class MovieViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     serializer_class = MovieSerializer
@@ -26,6 +28,7 @@ class MovieViewSet(
         "get",
         "post",
         "patch",
+        "delete",
         "head",
         "options",
     ]

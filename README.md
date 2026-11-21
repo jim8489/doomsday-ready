@@ -6,7 +6,7 @@ A full-stack MCU rewatch planner and cinema bundle booking optimizer. The applic
 
 ### Movie collection and prerequisites
 
-- Create and list movies, and update movie details or watched status.
+- Create, list, retrieve, update, and delete movies, including watched status and prerequisite relationships.
 - Movie titles are unique without regard to letter case.
 - Runtime is constrained to 1–300 minutes; release year must be a positive integer.
 - A movie can have zero or more prerequisites. A prerequisite must be watched before its dependent movie.
@@ -96,14 +96,14 @@ The repository includes a Render Blueprint in `render.yaml` for a public assessm
 
 ### Deployment outline
 
-1. Create a Neon PostgreSQL project and database. In its connection details, use the pooled host if available. Copy the database name, username, password, host, and port; keep these private.
+1. Create a Neon PostgreSQL project and database. Use the direct (unpooled) connection hostname for Django migrations. Copy the database name, username, password, host, and port; keep these private.
 2. Push the latest repository changes, including `render.yaml`, to GitHub.
 3. In Render, choose **New → Blueprint**, connect `jim8489/doomsday-ready`, select branch `main`, and apply the Blueprint.
 4. When prompted, enter the Neon values for `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_HOST`. Use port `5432`. Do not add secrets to the repository.
 5. Wait for the API and frontend deploys to finish. The intended public URLs are:
    - Frontend: `https://doomsday-ready-frontend.onrender.com`
-   - API: `https://doomsday-ready-api.onrender.com/api/health/`
-   - Swagger: `https://doomsday-ready-api.onrender.com/api/docs/`
+   - API: `https://doomsday-ready-api-2n2q.onrender.com/api/health/`
+   - Swagger: `https://doomsday-ready-api-2n2q.onrender.com/api/docs/`
 
    On an empty Neon database, the backend Docker entrypoint runs migrations and automatically seeds the assessment demo data. Verify that the Movies and Booking endpoints return the seeded records after deployment.
 
@@ -194,7 +194,9 @@ Interactive request/response schemas are available at `/api/docs/` when the back
 |---|---|---|
 | `GET` | `/api/movies/` | List movies |
 | `POST` | `/api/movies/` | Create a movie |
+| `GET` | `/api/movies/{id}/` | Retrieve a movie |
 | `PATCH` | `/api/movies/{id}/` | Update movie fields, watched status, or prerequisites |
+| `DELETE` | `/api/movies/{id}/` | Delete a movie and its prerequisite links |
 | `GET` | `/api/movies/{id}/rewatch-order/` | Build the prerequisite rewatch plan |
 | `GET` | `/api/cinemas/` | List cinemas and their bundle sizes |
 | `POST` | `/api/cinemas/` | Create a cinema |
@@ -356,4 +358,4 @@ docker compose up --build
 
 ## AI assistance disclosure
 
-ChatGPT and Claude were used as development assistants for design discussion, code review, debugging, and documentation support. Their suggestions were reviewed and adapted during implementation; the project owner is responsible for the final code and for running the verification commands above.
+ChatGPT (OpenAI) was used as an AI development assistant for architectural planning, technical guidance, debugging, code review, test-case suggestions, and documentation support. AI-generated suggestions were reviewed, adapted, and tested during implementation. The project author made the final technical decisions and is responsible for the submitted source code and application.

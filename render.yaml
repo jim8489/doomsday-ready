@@ -45,7 +45,7 @@ services:
     autoDeployTrigger: commit
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://doomsday-ready-api.onrender.com/api
+        value: https://doomsday-ready-api-2n2q.onrender.com/api
     routes:
       - type: rewrite
         source: /*

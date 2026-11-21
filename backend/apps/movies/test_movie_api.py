@@ -161,3 +161,27 @@ class MovieAPITests(APITestCase):
                 dependent_movie=self.iron_man,
             ).exists()
         )
+
+    def test_retrieve_movie_by_id(self):
+        response = self.client.get(self.detail_url(self.iron_man))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], str(self.iron_man.pk))
+        self.assertEqual(response.data["title"], "Iron Man")
+
+    def test_delete_movie_removes_dependency_edges(self):
+        MovieDependency.objects.create(
+            dependent_movie=self.avengers,
+            prerequisite_movie=self.iron_man,
+        )
+
+        response = self.client.delete(self.detail_url(self.iron_man))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Movie.objects.filter(pk=self.iron_man.pk).exists())
+        self.assertFalse(
+            MovieDependency.objects.filter(
+                dependent_movie=self.avengers,
+                prerequisite_movie=self.iron_man,
+            ).exists()
+        )

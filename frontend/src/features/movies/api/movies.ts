@@ -31,3 +31,9 @@ export async function updateMovie(
     body: payload,
   });
 }
+
+export async function deleteMovie(id: string): Promise<void> {
+  await apiRequest<void>(`/movies/${id}/`, {
+    method: "DELETE",
+  });
+}
