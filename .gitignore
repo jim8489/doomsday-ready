@@ -1,4 +1,3 @@
-cat > .gitignore <<'EOF'
 # Python
 __pycache__/
 *.py[cod]
@@ -13,12 +12,12 @@ htmlcov/
 staticfiles/
 media/
 
-# Environment
+# Environment files
 .env
 .env.*
 !.env.example
 
-# Node
+# Node / Vite
 node_modules/
 dist/
 .vite/
@@ -30,6 +29,5 @@ dist/
 # macOS
 .DS_Store
 
-# Docker
+# Logs
 *.log
-EOF

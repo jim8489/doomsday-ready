@@ -40,10 +40,10 @@ class Cinema(models.Model):
         ]
     @property
     def bundle_sizes(self):
-      return [
-        bundle.size
-        for bundle in self.bundles.all()
-    ]
+        return [
+            bundle.size
+            for bundle in self.bundles.all()
+        ]
 
     def __str__(self):
         return self.name
