@@ -61,7 +61,7 @@ class RewatchOrderAPITests(APITestCase):
         self.doomsday = Movie.objects.create(
             title="Avengers: Doomsday",
             release_year=2026,
-            runtime_minutes=180,
+            runtime_minutes=165,
         )
 
         dependencies = [

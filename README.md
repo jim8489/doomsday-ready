@@ -38,6 +38,54 @@ The React interface provides three main views: Movies, Rewatch Plan, and Booking
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS, TanStack Query
 - **Deployment:** Docker Compose, Gunicorn, Nginx
 
+## Demo data and assessment examples
+
+On a **new, empty database**, the Docker backend startup runs `python manage.py seed_demo_data --if-empty` after migrations. This makes the assessment scenarios available immediately in the UI. The command does not overwrite existing movie details, watched states, cinema records, or bundle sizes.
+
+For an existing database, run the command once to add any missing demo records without deleting existing data:
+
+```bash
+docker compose exec backend python manage.py seed_demo_data
+```
+
+### Avengers: Doomsday rewatch example
+
+The seed creates this editable sample dependency graph:
+
+```text
+Iron Man ─────────────────────────────┐
+                                      ├─> The Avengers
+Captain America: The First Avenger ──┘
+                                             |
+                                             v
+                                  Captain America: Civil War
+                                             |
+Thor: Ragnarok ──────────────────────────────┤
+                                             v
+                                  Avengers: Infinity War
+                                             |
+                                             v
+                                   Avengers: Endgame
+                                             |
+                                             v
+                                   Avengers: Doomsday
+```
+
+Select **Avengers: Doomsday** as the target in Rewatch Plan. The target is excluded from its prerequisite list. With the seeded watched states, the expected result is 7 prerequisites, 3 already watched, and 620 minutes of remaining runtime. This is a deliberately simplified dependency example for demonstrating the assignment's graph behaviour; it is **not** presented as an official or comprehensive MCU watch order. The Doomsday runtime is pre-release sample metadata and can be edited when a final runtime is confirmed.
+
+### Cinema booking examples
+
+The seed creates these four cinema records so each supplied algorithm example can be tried directly in the Booking view:
+
+| Cinema | Bundle sizes | Group size to try | Expected result |
+|---|---:|---:|---|
+| Cinema Alpha | `[1, 3, 4]` | `6` | 2 bundles: 2 × 3 |
+| Cinema Beta | `[2, 5]` | `11` | 4 bundles: 1 × 5 and 3 × 2 |
+| Cinema Gamma | `[6, 9, 20]` | `44` | 4 bundles: 1 × 20, 2 × 9, 1 × 6 |
+| Grand Cinema | `[4, 6]` | `7` | Impossible: no exact allocation |
+
+The seed is intentionally additive: it uses `get_or_create` and does not reset a user's existing watched status or movie fields. The `--if-empty` option is used during automatic Docker startup so an existing collection is left alone. Running the command without that option manually adds missing example records; existing custom prerequisite links are retained and the proposed demo graph is checked for cycles before new links are inserted.
+
 ## Run the complete application with Docker
 
 Prerequisites: Docker Desktop (or Docker Engine) with the Docker Compose plugin.
@@ -281,7 +329,7 @@ docker compose up --build
 - Watched count and remaining runtime are calculated over prerequisites only. Remaining runtime includes only unwatched prerequisite movies.
 - Movie release year is a positive integer; the 1–300 minute limit applies to runtime.
 - Cinema bundle sizes may be reused without a per-size quantity limit. The optimizer must find an exact seat total and minimize the number of bundles; it does not sell individual seats outside the configured bundles.
-- No official MCU chronological guide is bundled. The database's prerequisite relationships are editable sample data supplied for demonstrating the graph feature.
+- The seeded Avengers: Doomsday graph is a simplified, editable assessment example, not an official or comprehensive MCU chronological watch guide.
 
 ## AI assistance disclosure
 
